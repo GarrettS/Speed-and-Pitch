@@ -1,7 +1,9 @@
 # Speed-and-Pitch
+Adjust Pitch and Speed of any video on YouTube, Artistworks, Vimeo, and others.
+
+### Video Tutorial 
 https://www.youtube.com/watch?v=b8B0dWQRC9c
 
-Adjust Pitch and Speed of any video on YouTube.
 ## Installation:
 1. Copy the YouTube Speed & Pitch Bookmarklet
  bookmarklet code here:
