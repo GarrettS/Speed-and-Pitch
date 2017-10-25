@@ -14,7 +14,17 @@
         if("twitter.com" == location.hostname) {
             var twitterAppendTo = document.querySelector(".tweet-details-fixer") 
               || document.querySelector("#stream-items-id > .js-stream-item");
+            v = findTwitterVideoElement();
         }
+
+        function findTwitterVideoElement() {
+            var dialog = document.getElementById("permalink-overlay-dialog");
+            if(dialog) {
+                return dialog.querySelector("video");
+            }
+            return v;
+        }
+        
         if(artistworksMessageCaption) {
             showArtistworksMessageCaption(artistworksMessageCaption);
         }
