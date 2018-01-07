@@ -10,11 +10,15 @@
         var artistworksDiv = doc.getElementById("playlist0");
         var artistworksMessageCaption = doc.getElementById("msg-expanded");
         var vimeoAppendTo = document.querySelector(".player_outro_area");
+        var zIndex = 100;
 
         if("twitter.com" == location.hostname) {
-            var twitterAppendTo = document.querySelector(".tweet-details-fixer") 
-              || document.querySelector("#stream-items-id > .js-stream-item");
+            var twitterAppendTo = document.querySelector(".AdaptiveMedia-container") 
+                || document.querySelector(".tweet-details-fixer") 
+                || document.querySelector("#stream-items-id > .js-stream-item");
             v = findTwitterVideoElement();
+        } else if(/dailymotion\.com/.test(location.hostname)) {
+            zIndex = 10000;
         }
 
         function findTwitterVideoElement() {
@@ -29,12 +33,15 @@
             showArtistworksMessageCaption(artistworksMessageCaption);
         }
 
-        n = doc.getElementById("watch-header")
+        n = (doc.querySelector("#content #container")
+        || doc.getElementById("watch-header"))  // YT
+
         || doc.getElementById("player-focus-control") 
         || fbButtonsDiv 
         || artistworksDiv || artistworksMessageCaption
         || vimeoAppendTo 
         || twitterAppendTo
+//        || document.querySelector(".np_ControlsManager")
         || doc.body;
 
         if(!n || n.querySelector("#speed-slider")) return;
@@ -43,7 +50,7 @@
             fbButtonsDiv.style.position = "relative";
         }
 
-        n = makeFieldset(n);
+        const FIELDSET = makeFieldset(n);
 
         if(location.hostname == "twitter.com") {
             positionForTwitter(n);
@@ -54,8 +61,8 @@
 
         var PRESERVES_PITCH = getPreservesPitch(v);
 
-        var speedSlider = makeSpeedSlider(v,n);
-        var pitchSlider = makePitchSlider(v,n);
+        var speedSlider = makeSpeedSlider(v, FIELDSET);
+        var pitchSlider = makePitchSlider(v, FIELDSET);
         if(pitchSlider) {
             mutuallyExclude(pitchSlider, speedSlider, v);
         }
@@ -79,7 +86,8 @@
         function makeVideoSlider(text, v) {
             var label = doc.createElement("label");
             label.style.cssText = "display:block;font-weight:bold";
-            label.innerHTML = text + " <input type=\"range\" value=1> . "; 
+            label.innerHTML = text + " <input type=\"range\" value=1 " 
+                + "style='vertical-align:middle'> 100%"; 
             var i = label.firstElementChild;
             i.oninput= function(){ sliderInput(i, v) };
             setTimeout(function(){ i.value = 1; i.oninput()}, 10);
@@ -92,14 +100,14 @@
             setPercentText(i, data);
         }
 
-        function makeSpeedSlider(v,n,l,i) {
+        function makeSpeedSlider(v, fieldset,l,i) {
             l = makeVideoSlider("Speed", v);
             l.id="speed-slider";
             i = l.firstElementChild;
             i.min=.5;
             i.step=.05;
             i.max = 1;
-            n.insertBefore(l, n.firstChild);
+            fieldset.insertBefore(l, fieldset.firstChild);
             i.addEventListener("input", resetPreservesPitch);
             return i;
         }
@@ -111,7 +119,7 @@
             v[PRESERVES_PITCH] = 1;
         };
 
-        function makePitchSlider(v,n,l,i) {
+        function makePitchSlider(v, fieldset,l,i) {
             if(!PRESERVES_PITCH) return;
 
             l = makeVideoSlider("Pitch", v);
@@ -120,7 +128,7 @@
             i.max=1.1;
             i.value = 1;
             i.step=.005;
-            n.insertBefore(l, n.firstChild);
+            fieldset.insertBefore(l, fieldset.firstChild);
             i.addEventListener("input", function() {
                 v[PRESERVES_PITCH] = 0;
             });
@@ -128,26 +136,27 @@
         }
 
         function makeFieldset() {
-            var fieldset = doc.createElement("fieldset");
-            fieldset.style.cssText = 
-            "border: 3px groove #eee;background: #e3e3e3; padding: 3px";
+            var fieldsetLocal = doc.createElement("fieldset");
+            fieldsetLocal.style.cssText = 
+            "border: 3px groove #eee; background: #e3e3e3;" 
+            + "box-sizing: border-box; white-space: nowrap;"
+            + "padding: 3px; position: relative; z-index:" + zIndex;
             var legend = doc.createElement("legend");
             legend.textContent = "Pitch & Speed Controls";
             legend.style.cssText = "background: inherit;"
-            fieldset.appendChild(legend);
-            n.insertBefore(fieldset, n.firstChild);
-
-            return fieldset;
+            fieldsetLocal.appendChild(legend);
+            n.insertBefore(fieldsetLocal, n.firstChild);
+            return fieldsetLocal;
         }
 
-        function positionForTwitter(fieldset) {
-            fieldset.style.cssText += 
-            "position: absolute; top: -7px; left: -7px; z-index: 100;"
+        function positionForTwitter() {
+            FIELDSET.style.cssText += 
+            "position: absolute; z-index: 100;"
         }
 
-        function positionForStandalone(fieldset) {
-            fieldset.style.cssText += 
-            "position: relative; top: -33px;";
+        function positionForStandalone() {
+            FIELDSET.style.cssText += 
+            "top: -33px;";
 
         }
 
