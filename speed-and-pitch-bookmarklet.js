@@ -7,6 +7,9 @@
         if(!v) return;
 
 
+        removeAnyPriorSC();
+
+
         // XXX 
         // Replace window.alert to rid of "Hello, new user" alert, 
         // as seen in Firefox on YouTube.
@@ -36,8 +39,8 @@
             }
         } else if(/dailymotion\.com/.test(location.hostname)) {
             zIndex = 10000;
-        } else if("instagram.com" == location.hostname) {
-            specialCaseCssText += "position:fixed"
+        } else if(/instagram\.com/.test(location.hostname)) {
+            specialCaseCssText = "position: fixed;"
         }
 
         function findTwitterVideoElement() {
@@ -110,7 +113,9 @@
             var label = doc.createElement("label");
             label.style.cssText = "display:block;font-weight:bold";
             label.innerHTML = text + " <input type=\"range\" value=1 " 
-                + "style='vertical-align:middle'> 100%"; 
+                + "style='vertical-align:middle'> "
+                + "<b id='SPControlPercentText' "
+                + " style='display:inline-block; width: 3.3em'>100%</b>"; 
             var i = label.firstElementChild;
             i.oninput= function(){ sliderInput(i, v) };
             setTimeout(function(){ i.value = 1; i.oninput()}, 10);
@@ -161,11 +166,11 @@
         function makeFieldset(appendTo) {
             var fieldsetLocal = doc.createElement("fieldset");
             fieldsetLocal.id = "SPControlFieldset";
-            fieldsetLocal.style.cssText = 
-            "border: 3px groove #eee; background: #e3e3e3;" 
+            fieldsetLocal.style.cssText = "position: relative;"
+            + "border: 3px groove #eee; background: #e3e3e3;" 
             + "box-sizing: border-box; white-space: nowrap;"
-            + "padding: 3px; position: relative; z-index:" + zIndex;
-            fieldsetLocal.style.cssText += specialCaseCssText;
+            + "padding: 3px; z-index:" + zIndex
+            + "; " + specialCaseCssText;
 
 
             var legend = doc.createElement("legend");
@@ -188,7 +193,10 @@
         }
 
         function setPercentText(i, val) {
-            return i.nextSibling.data = val;
+            let percentText = document.getElementById("SPControlPercentText");
+            if(percentText) {
+                percentText.textContent = val;
+            }
         }
 
         function getPreservesPitch(v) {
@@ -198,6 +206,13 @@
 
         function showArtistworksMessageCaption(amc) {
             amc.style.cssText = "display:block; bottom: 10px";
+        }
+
+        function removeAnyPriorSC() {
+            var fieldset = document.getElementById("SPControlFieldset");
+            if(fieldset && fieldset.remove) {
+                fieldset.remove();
+            }
         }
     }
 ).call(window);
