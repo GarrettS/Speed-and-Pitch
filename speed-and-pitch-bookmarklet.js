@@ -21,8 +21,7 @@
         var artistworksDiv = doc.getElementById("playlist0");
         var artistworksMessageCaption = doc.getElementById("msg-expanded");
         var vimeoAppendTo = document.querySelector(".player_outro_area");
-        var zIndex = 100;
-        let specialCaseCssText = "";
+
 
         if("twitter.com" == location.hostname) {
 
@@ -37,10 +36,19 @@
             if(twitterAppendTo && twitterAppendTo.parentNode) {
                 twitterAppendTo.parentNode.style.overflow = "visible";
             }
-        } else if(/dailymotion\.com/.test(location.hostname)) {
-            zIndex = 10000;
-        } else if(/instagram\.com/.test(location.hostname)) {
-            specialCaseCssText = "position: fixed;"
+        } 
+
+
+        function getSpecialCaseCSS() {
+            let cssText = "z-index: 100;",
+                hostname = location.hostname;
+
+            if(/dailymotion\.com/.test(hostname)) {
+                cssText = "z-index: 10000;"
+            } else if(/instagram\.com/.test(hostname)) {
+                cssText += "position: fixed; top: 0;"
+            }
+            return cssText;
         }
 
         function findTwitterVideoElement() {
@@ -169,8 +177,8 @@
             fieldsetLocal.style.cssText = "position: relative;"
             + "border: 3px groove #eee; background: #e3e3e3;" 
             + "box-sizing: border-box; white-space: nowrap;"
-            + "padding: 3px; z-index:" + zIndex
-            + "; " + specialCaseCssText;
+            + "padding: 3px; "
+            + "; " + getSpecialCaseCSS();
 
 
             var legend = doc.createElement("legend");
