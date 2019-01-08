@@ -19,14 +19,25 @@
         var artistworksMessageCaption = doc.getElementById("msg-expanded");
         var vimeoAppendTo = document.querySelector(".player_outro_area");
         var zIndex = 100;
+        let specialCaseCssText = "";
 
         if("twitter.com" == location.hostname) {
-            var twitterAppendTo = document.querySelector(".AdaptiveMedia-container") 
+
+            let overlayElement = document.getElementById("permalink-overlay-dialog");
+            var twitterAppendTo = overlayElement && 
+                overlayElement.querySelector(".AdaptiveMedia-container")
+                || document.querySelector(".AdaptiveMedia-container") 
                 || document.querySelector(".tweet-details-fixer") 
                 || document.querySelector("#stream-items-id > .js-stream-item");
             v = findTwitterVideoElement();
+
+            if(twitterAppendTo && twitterAppendTo.parentNode) {
+                twitterAppendTo.parentNode.style.overflow = "visible";
+            }
         } else if(/dailymotion\.com/.test(location.hostname)) {
             zIndex = 10000;
+        } else if("instagram.com" == location.hostname) {
+            specialCaseCssText += "position:fixed"
         }
 
         function findTwitterVideoElement() {
@@ -62,7 +73,7 @@
 
         if(location.hostname == "twitter.com") {
             positionForTwitter(appendTo);
-        } else if(v.parentNode  == document.body){
+        } else if(v.parentNode  == document.body) {
             positionForStandalone(appendTo);
             v.style.width = "95%";
         }
@@ -149,10 +160,14 @@
 
         function makeFieldset(appendTo) {
             var fieldsetLocal = doc.createElement("fieldset");
+            fieldsetLocal.id = "SPControlFieldset";
             fieldsetLocal.style.cssText = 
             "border: 3px groove #eee; background: #e3e3e3;" 
             + "box-sizing: border-box; white-space: nowrap;"
             + "padding: 3px; position: relative; z-index:" + zIndex;
+            fieldsetLocal.style.cssText += specialCaseCssText;
+
+
             var legend = doc.createElement("legend");
             legend.textContent = "Pitch & Speed Controls";
             legend.style.cssText = "background: inherit;"
@@ -163,7 +178,7 @@
 
         function positionForTwitter() {
             FIELDSET.style.cssText += 
-            "position: absolute; z-index: 100;"
+            "position: absolute; top: -40px; z-index: 100;"
         }
 
         function positionForStandalone() {
